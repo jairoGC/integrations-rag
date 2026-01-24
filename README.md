@@ -27,12 +27,28 @@ This project builds a RAG pipeline that:
 cd /path/to/integrations-rag
 ```
 
-2. Install dependencies:
+2. Create and activate a virtual environment:
+
+**On macOS/Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+**On Windows:**
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+You should see `(venv)` in your terminal prompt indicating the virtual environment is active.
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables (create a `.env` file):
+4. Set up environment variables (create a `.env` file):
 ```bash
 OPENAI_API_KEY=your_openai_api_key
 ANTHROPIC_API_KEY=your_anthropic_api_key
@@ -216,18 +232,25 @@ See `integrations-rag/prd.json` for full details.
 
 ## Example Workflow
 
-1. **Prepare your PDFs:**
+1. **Activate virtual environment:**
+   ```bash
+   source venv/bin/activate  # macOS/Linux
+   # or
+   venv\Scripts\activate  # Windows
+   ```
+
+2. **Prepare your PDFs:**
    ```bash
    mkdir -p data/pdfs
    # Add your PDFs with proper naming convention
    ```
 
-2. **Ingest documents:**
+3. **Ingest documents:**
    ```bash
    python -m src.ingestion.pdf_ingestion data/pdfs
    ```
 
-3. **Expected output:**
+4. **Expected output:**
    ```
    ============================================================
    Ingestion Summary
@@ -247,6 +270,49 @@ See `integrations-rag/prd.json` for full details.
    ```
 
 ## Troubleshooting
+
+### Virtual Environment Issues
+
+**Activating the virtual environment:**
+
+Make sure your virtual environment is activated before running any commands:
+```bash
+# Check if virtual environment is active (you should see (venv) in prompt)
+# If not active, activate it:
+
+# macOS/Linux:
+source venv/bin/activate
+
+# Windows:
+venv\Scripts\activate
+```
+
+**Deactivating the virtual environment:**
+```bash
+deactivate
+```
+
+**Virtual environment not found:**
+
+If you get an error that `venv` doesn't exist:
+```bash
+# Create it first
+python3 -m venv venv
+
+# Then activate it
+source venv/bin/activate  # macOS/Linux
+```
+
+**Wrong Python version in virtual environment:**
+
+Make sure you create the venv with Python 3.10+:
+```bash
+# Check your Python version
+python3 --version
+
+# Create venv with specific Python version
+python3.10 -m venv venv
+```
 
 ### PDF Text Extraction Fails
 
