@@ -16,8 +16,8 @@
         "Typecheck/lint passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed with PDFIngestionPipeline class, all tests passing, mypy and pylint passing"
     },
     {
       "id": "US-002",

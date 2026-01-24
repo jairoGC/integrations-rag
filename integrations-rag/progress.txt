@@ -1,3 +1,24 @@
 # Ralph Progress Log
 Started: Sat Jan 24 15:22:50 -05 2026
 ---
+
+## 2026-01-24 17:00 - US-001
+- Implemented PDF document ingestion pipeline
+- Created PDFIngestionPipeline class with text extraction and metadata parsing
+- Handles document types: provider_doc and jira_ticket
+- Extracts provider name and date from filename conventions
+- Graceful error handling for malformed PDFs
+- Files changed:
+  - src/ingestion/pdf_ingestion.py (new)
+  - src/ingestion/__init__.py (new)
+  - tests/test_pdf_ingestion.py (new)
+  - requirements.txt (new)
+  - pyproject.toml (new)
+- **Learnings:**
+  - This project uses Python 3.10 with type annotations
+  - PyPDF2 library for PDF text extraction
+  - Filename format: {document_type}_{provider_name}_{date}.pdf
+  - Document types must match exactly: "provider_doc" or "jira_ticket"
+  - Quality checks required: mypy (strict mode) and pylint (9.0+ score acceptable)
+  - All tests must pass before committing
+---
