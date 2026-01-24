@@ -22,3 +22,24 @@ Started: Sat Jan 24 15:22:50 -05 2026
   - Quality checks required: mypy (strict mode) and pylint (9.0+ score acceptable)
   - All tests must pass before committing
 ---
+
+## 2026-01-24 17:30 - US-002
+- Implemented text chunking strategy with recursive character splitter
+- Created TextChunker class with configurable chunk size and overlap
+- Default: 1000 tokens (4000 chars) with 200 token overlap (800 chars)
+- Section header extraction supporting markdown (#), all-caps, and colon-ending formats
+- Chunks inherit all parent document metadata (document_type, provider_name, etc.)
+- Added section_title to chunk metadata when headers detected
+- Chunk statistics: count, avg/min/max size, size distribution by bucket
+- Files changed:
+  - src/chunking/text_chunker.py (new)
+  - src/chunking/__init__.py (new)
+  - tests/test_text_chunker.py (new, 16 tests)
+- **Learnings:**
+  - Use dataclasses for clean data structures (Chunk class)
+  - Recursive splitting with multiple separators (paragraph, sentence, word)
+  - Character-to-token ratio: approximately 4 chars per token
+  - Overlap helps maintain context between chunks
+  - Section headers provide important chunk context
+  - Small chunks should be merged to avoid very short chunks
+---
