@@ -29,16 +29,9 @@ cd /path/to/integrations-rag
 
 2. Create and activate a virtual environment:
 
-**On macOS/Linux:**
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-```
-
-**On Windows:**
-```bash
-python -m venv venv
-venv\Scripts\activate
 ```
 
 You should see `(venv)` in your terminal prompt indicating the virtual environment is active.
@@ -234,9 +227,7 @@ See `integrations-rag/prd.json` for full details.
 
 1. **Activate virtual environment:**
    ```bash
-   source venv/bin/activate  # macOS/Linux
-   # or
-   venv\Scripts\activate  # Windows
+   source venv/bin/activate
    ```
 
 2. **Prepare your PDFs:**
@@ -279,12 +270,7 @@ Make sure your virtual environment is activated before running any commands:
 ```bash
 # Check if virtual environment is active (you should see (venv) in prompt)
 # If not active, activate it:
-
-# macOS/Linux:
 source venv/bin/activate
-
-# Windows:
-venv\Scripts\activate
 ```
 
 **Deactivating the virtual environment:**
@@ -300,7 +286,7 @@ If you get an error that `venv` doesn't exist:
 python3 -m venv venv
 
 # Then activate it
-source venv/bin/activate  # macOS/Linux
+source venv/bin/activate
 ```
 
 **Wrong Python version in virtual environment:**
