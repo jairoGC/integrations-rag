@@ -150,3 +150,45 @@ Started: Sat Jan 24 15:22:50 -05 2026
   - Pipeline integration: VectorStore -> Retriever -> AnswerGenerator
   - Use retrieve_with_fallback for better user experience
 ---
+## 2026-01-26 - US-007
+- Implemented precision@k evaluation metrics for RAG retrieval
+- Created PrecisionEvaluator class that calculates precision = (relevant in top-k) / k
+- Also implemented RecallEvaluator and LatencyTracker in same module (will be used for US-008 and US-009)
+- EvaluationResult dataclass for standardized result storage
+- format_evaluation_report function for human-readable output
+- Configurable k values, target thresholds, and per-query tracking
+- Files changed:
+  - src/evaluation/__init__.py (new)
+  - src/evaluation/metrics.py (new)
+  - tests/test_evaluation.py (new, 30 tests)
+- **Learnings for future iterations:**
+  - Precision@k formula: divide by k (parameter), not by len(retrieved) for consistent scoring
+  - Test functions that execute too quickly may return latency=0.0, use >= 0 not > 0 assertions
+  - RecallEvaluator returns dict mapping k values to EvaluationResult objects
+  - LatencyTracker.evaluate() resets latencies automatically to avoid contamination
+  - Optional type hints required: use Optional[List[int]] not List[int] = None
+  - Percentile calculation needs interpolation between data points for accuracy
+  - EvaluationResult.to_dict() allows easy serialization to JSON for reporting
+  - Target thresholds checked automatically, results include target_met boolean
+---
+
+## 2026-01-26 - US-008 & US-009
+- US-008 (Recall evaluation) and US-009 (Latency tracking) were implemented together with US-007
+- RecallEvaluator class calculates recall@k for multiple k values (default: 5, 10, 20)
+- Returns dict mapping k to EvaluationResult, checks target for k=10 (>85% target)
+- LatencyTracker class measures query latency and calculates p50, p95, p99 percentiles
+- Custom percentile calculation with linear interpolation for accuracy
+- LatencyTracker.evaluate() measures end-to-end pipeline latency, checks p95 < 3s target
+- Both classes tested (8 tests for Recall, 7 for Latency) and share same quality metrics
+- Files changed:
+  - src/evaluation/metrics.py (RecallEvaluator and LatencyTracker already included)
+  - tests/test_evaluation.py (tests already included)
+- **Learnings for future iterations:**
+  - Related evaluation metrics should be grouped in single module for cohesion
+  - RecallEvaluator.evaluate() returns Dict[int, EvaluationResult] not single result
+  - LatencyTracker stores all latencies for percentile calculation across test set
+  - measure_query() is reusable for any callable, not just pipeline queries
+  - percentile() function uses linear interpolation: (f*(c-k) + c*(k-f))
+  - Evaluation modules naturally group together: precision, recall, latency all in metrics.py
+---
+

@@ -112,8 +112,8 @@
         "Typecheck/lint passes"
       ],
       "priority": 7,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed with PrecisionEvaluator class, 30 tests passing, mypy clean, pylint 9.93/10"
     },
     {
       "id": "US-008",
@@ -128,8 +128,8 @@
         "Typecheck/lint passes"
       ],
       "priority": 8,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed with RecallEvaluator class (implemented alongside US-007), 8 tests passing, mypy clean, pylint 9.93/10"
     },
     {
       "id": "US-009",
@@ -144,8 +144,8 @@
         "Typecheck/lint passes"
       ],
       "priority": 9,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed with LatencyTracker class (implemented alongside US-007), 7 tests passing, mypy clean, pylint 9.93/10"
     },
     {
       "id": "US-010",
