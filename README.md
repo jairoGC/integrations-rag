@@ -144,7 +144,47 @@ stripe_chunks = vector_store.get_chunks_by_metadata({"provider_name": "Stripe"})
 vector_store.close()
 ```
 
-### 4. Query Interface
+### 4. Metadata-Filtered Retrieval
+
+Retrieve relevant chunks using metadata-filtered vector search:
+
+**Python API:**
+```python
+from src.retrieval import Retriever
+from src.indexing import VectorStore
+
+# Initialize vector store and retriever
+vector_store = VectorStore()
+retriever = Retriever(vector_store)
+
+# Simple retrieval with metadata filtering
+results = retriever.retrieve("How do Stripe refunds work?", top_k=5)
+
+# The query classifier automatically detects "Stripe" and applies metadata filters
+for result in results:
+    print(f"Score: {result.similarity_score:.4f}")
+    print(f"Provider: {result.metadata['provider_name']}")
+    print(f"Content: {result.content[:100]}...")
+    print()
+
+# Retrieval with fallback (tries filtered, falls back to unfiltered)
+results = retriever.retrieve_with_fallback("How do refunds work?", top_k=5)
+
+# Manual filter control
+results = retriever.retrieve(
+    "What is the API documentation?",
+    top_k=10,
+    apply_filters=False,  # Disable automatic filtering
+    min_similarity=0.7     # Minimum similarity threshold
+)
+
+# Query classification only
+classification = retriever.query_classifier.classify_query("Stripe and PayPal fees")
+print(classification)
+# {'providers': {'Stripe', 'Paypal'}, 'document_type': None, 'has_filters': True}
+```
+
+### 5. Query Interface
 
 (Coming soon - US-006)
 
@@ -162,12 +202,15 @@ integrations-rag/
 │   ├── indexing/
 │   │   ├── __init__.py
 │   │   └── vector_store.py        # MongoDB Atlas vector store
-│   ├── retrieval/                 # (Coming soon)
+│   ├── retrieval/
+│   │   ├── __init__.py
+│   │   └── retriever.py           # Metadata-filtered retrieval
 │   └── generation/                # (Coming soon)
 ├── tests/
 │   ├── test_pdf_ingestion.py     # Tests for PDF ingestion
 │   ├── test_text_chunker.py      # Tests for text chunking
-│   └── test_vector_store.py      # Tests for vector store
+│   ├── test_vector_store.py      # Tests for vector store
+│   └── test_retriever.py         # Tests for retrieval
 ├── integrations-rag/
 │   ├── prd.json                   # Product requirements document
 │   └── progress.txt               # Development progress log
@@ -277,11 +320,18 @@ Tool configurations are defined in `pyproject.toml`:
 - Batch upsert operations
 - 23 comprehensive tests
 
+✅ **US-004**: Metadata-filtered retrieval
+- Query classification (provider and document type extraction)
+- Cosine similarity search
+- Automatic metadata filtering
+- Fallback to unfiltered search
+- Top-k retrieval with configurable similarity threshold
+- 36 comprehensive tests
+
 ### In Progress
 
 The following user stories are planned:
 
-- **US-004**: Metadata-filtered retrieval
 - **US-005**: LLM-based answer generation
 - **US-006**: Query interface (CLI/API)
 - **US-007-011**: Evaluation metrics (precision, recall, latency, groundedness)
