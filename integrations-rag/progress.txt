@@ -121,3 +121,32 @@ Started: Sat Jan 24 15:22:50 -05 2026
   - Temperature=0.7 works well for balanced creativity and accuracy
   - Max tokens 1024 sufficient for most documentation answers
 ---
+## 2026-01-26 - US-006
+- Implemented complete CLI query interface for RAG pipeline
+- Created RAGPipeline class that integrates all components (ingestion, retrieval, generation)
+- Command-line argument parsing with argparse
+- Rich formatted output with sections: query, filters, answer, sources, stats
+- Displays metadata filters applied (providers, document types)
+- Performance timing breakdown (retrieval, generation, total time)
+- Environment variable validation (MONGODB_URI, API keys)
+- Support for both GPT and Claude models via CLI flags
+- Configurable parameters: --top-k, --min-similarity, --model, --database, --collection
+- Graceful error handling with user-friendly messages
+- Warning when response exceeds 3 second target
+- Files changed:
+  - src/cli.py (new)
+  - tests/test_cli.py (new, 20 tests)
+  - README.md (updated with CLI usage examples)
+- **Learnings for future iterations:**
+  - argparse provides clean CLI interface with help text
+  - nargs="?" allows positional argument to be optional
+  - Environment variable validation should happen before initialization
+  - Use logging for internal messages, print() for user output
+  - Format response separately from generation for flexibility
+  - Time each stage separately for performance debugging
+  - sys.exit() return codes: 0=success, 1=error, 130=interrupted
+  - Include usage examples in argparse epilog for better UX
+  - Validate API key based on model choice (Claude vs GPT)
+  - Pipeline integration: VectorStore -> Retriever -> AnswerGenerator
+  - Use retrieve_with_fallback for better user experience
+---
