@@ -93,3 +93,31 @@ Started: Sat Jan 24 15:22:50 -05 2026
   - QueryClassifier is case-insensitive but returns capitalized provider names
   - Fallback pattern improves user experience when filters are too restrictive
 ---
+## 2026-01-26 - US-005
+- Implemented LLM-based answer generation with Claude and GPT-4 support
+- Created AnswerGenerator class with unified interface for both providers
+- System prompt enforces context-only answers with source citations
+- Automatic detection of insufficient information responses
+- Context formatting includes source metadata (filename, provider, type)
+- Citation formatting for user-friendly display
+- Support for Claude models: claude-3-opus, claude-3-sonnet
+- Support for GPT models: gpt-4, gpt-3.5-turbo
+- Configurable minimum chunks threshold before generating answer
+- Files changed:
+  - src/generation/__init__.py (new)
+  - src/generation/answer_generator.py (new)
+  - tests/test_answer_generator.py (new, 21 tests)
+  - requirements.txt (added anthropic>=0.18.0)
+  - README.md (updated with generation examples)
+- **Learnings for future iterations:**
+  - OpenAI and Anthropic have different API structures (chat.completions vs messages)
+  - Claude returns content blocks, GPT returns message.content directly
+  - Use Union types for clients that can be different types
+  - Type: ignore comments needed when mocking prevents isinstance checks
+  - System prompts should explicitly request source citations
+  - Answer detection: check for phrases like "don't have enough information"
+  - Claude API requires system parameter separate from messages array
+  - GPT API includes system message in messages array as role "system"
+  - Temperature=0.7 works well for balanced creativity and accuracy
+  - Max tokens 1024 sufficient for most documentation answers
+---
