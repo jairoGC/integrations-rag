@@ -43,3 +43,27 @@ Started: Sat Jan 24 15:22:50 -05 2026
   - Section headers provide important chunk context
   - Small chunks should be merged to avoid very short chunks
 ---
+## 2026-01-26 - US-003
+- Implemented vector database setup and indexing with MongoDB Atlas
+- Created VectorStore class for database operations and chunk indexing
+- Created EmbeddingProvider class for OpenAI text-embedding-3-small embeddings
+- Embedding dimensions: 1536 (OpenAI text-embedding-3-small)
+- Automatic metadata index creation on document_type and provider_name
+- Batch upsert operations supporting configurable batch sizes (default: 100)
+- Files changed:
+  - src/indexing/__init__.py (new)
+  - src/indexing/vector_store.py (new)
+  - tests/test_vector_store.py (new, 23 tests)
+  - requirements.txt (updated for dependency compatibility)
+  - README.md (updated with vector indexing documentation)
+- **Learnings for future iterations:**
+  - Environment variables required: OPENAI_API_KEY and MONGODB_URI
+  - OpenAI embedding API supports batch operations for efficiency
+  - MongoDB upsert pattern: update_one with upsert=True for single, bulk_write for batches
+  - Use UpdateOne operations in bulk_write for efficient batch upserts
+  - Metadata indexes should be created at initialization for query performance
+  - Mock external dependencies (OpenAI, MongoDB) in tests for fast, reliable testing
+  - Requirements.txt version pinning: use >= for flexibility with langchain dependencies
+  - VectorStore.index_batch processes chunks in configurable batches to avoid API limits
+  - Embedding generation should filter out empty texts to avoid API errors
+---
