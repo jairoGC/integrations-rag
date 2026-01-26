@@ -184,7 +184,57 @@ print(classification)
 # {'providers': {'Stripe', 'Paypal'}, 'document_type': None, 'has_filters': True}
 ```
 
-### 5. Query Interface
+### 5. LLM-based Answer Generation
+
+Generate natural language answers with source citations:
+
+**Python API:**
+```python
+from src.generation import AnswerGenerator
+from src.retrieval import Retriever
+from src.indexing import VectorStore
+
+# Initialize components
+vector_store = VectorStore()
+retriever = Retriever(vector_store)
+
+# Initialize answer generator (supports both Claude and GPT-4)
+# Using Claude:
+generator = AnswerGenerator(model="claude-3-sonnet-20240229")
+# Or using GPT-4:
+# generator = AnswerGenerator(model="gpt-4")
+
+# Retrieve relevant chunks
+query = "How do Stripe refunds work?"
+results = retriever.retrieve(query, top_k=5)
+
+# Convert retrieval results to chunks format
+chunks = [
+    {
+        "chunk_id": r.chunk_id,
+        "content": r.content,
+        "metadata": r.metadata,
+    }
+    for r in results
+]
+
+# Generate answer with citations
+answer = generator.generate_answer(
+    query=query,
+    retrieved_chunks=chunks,
+    min_chunks=1  # Minimum chunks required
+)
+
+# Display formatted answer with citations
+print(generator.format_answer_with_citations(answer))
+
+# Access answer components
+print(f"Has answer: {answer.has_answer}")
+print(f"Model used: {answer.model}")
+print(f"Number of sources: {len(answer.sources)}")
+```
+
+### 6. Query Interface
 
 (Coming soon - US-006)
 
@@ -205,12 +255,15 @@ integrations-rag/
 │   ├── retrieval/
 │   │   ├── __init__.py
 │   │   └── retriever.py           # Metadata-filtered retrieval
-│   └── generation/                # (Coming soon)
+│   └── generation/
+│       ├── __init__.py
+│       └── answer_generator.py    # LLM-based answer generation
 ├── tests/
 │   ├── test_pdf_ingestion.py     # Tests for PDF ingestion
 │   ├── test_text_chunker.py      # Tests for text chunking
 │   ├── test_vector_store.py      # Tests for vector store
-│   └── test_retriever.py         # Tests for retrieval
+│   ├── test_retriever.py         # Tests for retrieval
+│   └── test_answer_generator.py  # Tests for answer generation
 ├── integrations-rag/
 │   ├── prd.json                   # Product requirements document
 │   └── progress.txt               # Development progress log
@@ -328,11 +381,18 @@ Tool configurations are defined in `pyproject.toml`:
 - Top-k retrieval with configurable similarity threshold
 - 36 comprehensive tests
 
+✅ **US-005**: LLM-based answer generation
+- Support for Claude (3-Opus, 3-Sonnet) and GPT (4, 3.5-turbo)
+- System prompt enforcing context-only answers
+- Automatic source citation formatting
+- Graceful handling of insufficient information
+- Configurable minimum chunk threshold
+- 21 comprehensive tests
+
 ### In Progress
 
 The following user stories are planned:
 
-- **US-005**: LLM-based answer generation
 - **US-006**: Query interface (CLI/API)
 - **US-007-011**: Evaluation metrics (precision, recall, latency, groundedness)
 
