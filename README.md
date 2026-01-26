@@ -90,11 +90,59 @@ for doc in documents:
 
 ### 2. Document Chunking
 
-(Coming soon - US-002)
+Chunk documents into semantic units:
+
+**Python API:**
+```python
+from src.chunking import TextChunker
+
+chunker = TextChunker(chunk_size_tokens=1000, overlap_tokens=200)
+chunks = chunker.chunk_document(content, metadata)
+
+# Get statistics
+stats = chunker.get_chunk_statistics()
+print(f"Created {stats['count']} chunks")
+print(f"Average size: {stats['avg_size']} characters")
+```
 
 ### 3. Vector Database Indexing
 
-(Coming soon - US-003)
+Index chunks with embeddings in MongoDB Atlas:
+
+**Python API:**
+```python
+from src.indexing import VectorStore
+
+# Initialize vector store (requires OPENAI_API_KEY and MONGODB_URI env vars)
+vector_store = VectorStore(
+    database_name="yuno_rag",
+    collection_name="chunks"
+)
+
+# Index a single chunk
+vector_store.index_chunk(
+    chunk_id="chunk_001",
+    content="Your chunk content here",
+    metadata={"document_type": "provider_doc", "provider_name": "Stripe"}
+)
+
+# Index multiple chunks in batch
+chunks = [
+    {
+        "chunk_id": "chunk_001",
+        "content": "Content 1",
+        "metadata": {"document_type": "provider_doc", "provider_name": "Stripe"}
+    },
+    # ... more chunks
+]
+indexed_ids = vector_store.index_batch(chunks)
+
+# Query chunks by metadata
+stripe_chunks = vector_store.get_chunks_by_metadata({"provider_name": "Stripe"})
+
+# Clean up
+vector_store.close()
+```
 
 ### 4. Query Interface
 
@@ -108,12 +156,18 @@ integrations-rag/
 │   ├── ingestion/
 │   │   ├── __init__.py
 │   │   └── pdf_ingestion.py      # PDF document ingestion pipeline
-│   ├── chunking/                  # (Coming soon)
-│   ├── vectordb/                  # (Coming soon)
+│   ├── chunking/
+│   │   ├── __init__.py
+│   │   └── text_chunker.py        # Text chunking strategy
+│   ├── indexing/
+│   │   ├── __init__.py
+│   │   └── vector_store.py        # MongoDB Atlas vector store
 │   ├── retrieval/                 # (Coming soon)
 │   └── generation/                # (Coming soon)
 ├── tests/
-│   └── test_pdf_ingestion.py     # Tests for PDF ingestion
+│   ├── test_pdf_ingestion.py     # Tests for PDF ingestion
+│   ├── test_text_chunker.py      # Tests for text chunking
+│   └── test_vector_store.py      # Tests for vector store
 ├── integrations-rag/
 │   ├── prd.json                   # Product requirements document
 │   └── progress.txt               # Development progress log
@@ -210,12 +264,23 @@ Tool configurations are defined in `pyproject.toml`:
 - Handles errors gracefully
 - Comprehensive test coverage
 
+✅ **US-002**: Document chunking strategy
+- Recursive character splitter (1000 token chunks, 200 token overlap)
+- Section header extraction and preservation
+- Metadata inheritance
+- Chunk statistics
+
+✅ **US-003**: Vector database setup and indexing
+- MongoDB Atlas integration
+- OpenAI text-embedding-3-small embeddings (1536 dimensions)
+- Metadata indexes on document_type and provider_name
+- Batch upsert operations
+- 23 comprehensive tests
+
 ### In Progress
 
 The following user stories are planned:
 
-- **US-002**: Document chunking strategy
-- **US-003**: Vector database setup and indexing
 - **US-004**: Metadata-filtered retrieval
 - **US-005**: LLM-based answer generation
 - **US-006**: Query interface (CLI/API)
