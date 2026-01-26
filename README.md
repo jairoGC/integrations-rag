@@ -234,9 +234,77 @@ print(f"Model used: {answer.model}")
 print(f"Number of sources: {len(answer.sources)}")
 ```
 
-### 6. Query Interface
+### 6. Query Interface (CLI)
 
-(Coming soon - US-006)
+Query the documentation system from the command line:
+
+**Basic Usage:**
+```bash
+# Set required environment variables
+export MONGODB_URI="your_mongodb_connection_string"
+export OPENAI_API_KEY="your_openai_api_key"
+# Or for Claude:
+# export ANTHROPIC_API_KEY="your_anthropic_api_key"
+
+# Run a query
+python -m src.cli "How do Stripe refunds work?"
+
+# Or use the --query flag
+python -m src.cli --query "How do Stripe refunds work?"
+```
+
+**Advanced Options:**
+```bash
+# Use Claude model
+python -m src.cli "What is PayPal's auth flow?" --model claude-3-sonnet-20240229
+
+# Retrieve more chunks
+python -m src.cli "Show me error handling" --top-k 10
+
+# Set minimum similarity threshold
+python -m src.cli "How do refunds work?" --min-similarity 0.7
+
+# Use custom database/collection
+python -m src.cli "Test query" --database custom_db --collection custom_coll
+
+# Enable verbose logging
+python -m src.cli "Test query" --verbose
+```
+
+**Python API:**
+```python
+from src.cli import RAGPipeline
+
+# Initialize pipeline
+pipeline = RAGPipeline(
+    model="gpt-4",
+    database_name="yuno_rag",
+    collection_name="chunks"
+)
+
+# Process query
+response = pipeline.query(
+    "How do Stripe refunds work?",
+    top_k=5,
+    min_similarity=0.0
+)
+
+# Access response
+print(response["answer"].answer)
+print(f"Retrieved {response['num_chunks_retrieved']} chunks")
+print(f"Total time: {response['timing']['total']:.3f}s")
+
+# Clean up
+pipeline.close()
+```
+
+**Response Format:**
+The CLI displays:
+- Query text
+- Metadata filters applied (if any)
+- Generated answer
+- Source citations (filename, provider, type)
+- Statistics (chunks retrieved, timing, model used)
 
 ## Project Structure
 
@@ -255,15 +323,17 @@ integrations-rag/
 │   ├── retrieval/
 │   │   ├── __init__.py
 │   │   └── retriever.py           # Metadata-filtered retrieval
-│   └── generation/
-│       ├── __init__.py
-│       └── answer_generator.py    # LLM-based answer generation
+│   ├── generation/
+│   │   ├── __init__.py
+│   │   └── answer_generator.py    # LLM-based answer generation
+│   └── cli.py                     # CLI query interface
 ├── tests/
 │   ├── test_pdf_ingestion.py     # Tests for PDF ingestion
 │   ├── test_text_chunker.py      # Tests for text chunking
 │   ├── test_vector_store.py      # Tests for vector store
 │   ├── test_retriever.py         # Tests for retrieval
-│   └── test_answer_generator.py  # Tests for answer generation
+│   ├── test_answer_generator.py  # Tests for answer generation
+│   └── test_cli.py               # Tests for CLI interface
 ├── integrations-rag/
 │   ├── prd.json                   # Product requirements document
 │   └── progress.txt               # Development progress log
@@ -389,11 +459,19 @@ Tool configurations are defined in `pyproject.toml`:
 - Configurable minimum chunk threshold
 - 21 comprehensive tests
 
+✅ **US-006**: Query interface (CLI)
+- Complete command-line interface
+- Integrates all pipeline components
+- Rich formatted output with citations
+- Shows metadata filters applied
+- Performance timing statistics
+- Error handling with user-friendly messages
+- 20 comprehensive tests
+
 ### In Progress
 
 The following user stories are planned:
 
-- **US-006**: Query interface (CLI/API)
 - **US-007-011**: Evaluation metrics (precision, recall, latency, groundedness)
 
 See `integrations-rag/prd.json` for full details.
