@@ -67,3 +67,29 @@ Started: Sat Jan 24 15:22:50 -05 2026
   - VectorStore.index_batch processes chunks in configurable batches to avoid API limits
   - Embedding generation should filter out empty texts to avoid API errors
 ---
+## 2026-01-26 - US-004
+- Implemented metadata-filtered retrieval system with query classification
+- Created QueryClassifier for extracting provider names and document types from queries
+- Supports 10+ payment providers: Stripe, PayPal, Adyen, Braintree, Square, etc.
+- Created Retriever class with cosine similarity search using numpy
+- Automatic metadata filtering based on query classification results
+- Fallback mechanism: tries filtered search first, falls back to unfiltered
+- Top-k retrieval with configurable parameters (default k=5)
+- Minimum similarity threshold support for filtering low-quality results
+- Files changed:
+  - src/retrieval/__init__.py (new)
+  - src/retrieval/retriever.py (new)
+  - tests/test_retriever.py (new, 36 tests)
+  - requirements.txt (added numpy for cosine similarity)
+  - README.md (updated with retrieval examples)
+- **Learnings for future iterations:**
+  - Cosine similarity formula: dot(a,b) / (norm(a) * norm(b))
+  - Numpy provides efficient vector operations for similarity computation
+  - Regex word boundaries (\b) prevent false provider matches (e.g., "striped" vs "stripe")
+  - Query classification should happen before retrieval to enable metadata filtering
+  - MongoDB $in operator supports multiple provider filters in single query
+  - Mock objects need proper __iter__ implementation for list() compatibility in tests
+  - Retriever uses get_chunks_by_metadata when filters detected, collection.find() otherwise
+  - QueryClassifier is case-insensitive but returns capitalized provider names
+  - Fallback pattern improves user experience when filters are too restrictive
+---
